@@ -71,8 +71,9 @@ export default function KtpPage() {
             const base64String = await convertToBase64(selectedFile);
             const res = await ocrKtp(base64String);
 
-            if (res.status !== false) { // Handling potential different response structures
-                setResult(res.data || res);
+            // User provided example shows status: "success"
+            if (res.status === true || res.status === "success") {
+                setResult(res); // Show full response as requested
             } else {
                 setError(res.message || "Gagal memproses KTP");
             }
