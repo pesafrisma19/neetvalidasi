@@ -12,6 +12,8 @@ export const metadata: Metadata = {
 }
 
 import { ThemeProvider } from "@/components/theme-provider"
+import { TopNav } from "@/components/top-nav"
+import { BottomNav } from "@/components/bottom-nav"
 
 export default function RootLayout({
     children,
@@ -20,20 +22,21 @@ export default function RootLayout({
 }) {
     return (
         <html lang="id" suppressHydrationWarning>
-            <body className={cn(inter.className, "bg-ios-bg dark:bg-black min-h-screen text-foreground antialiased selection:bg-ios-blue/30")}>
+            <body className={cn(inter.className, "bg-ios-bg dark:bg-black min-h-screen text-foreground antialiased selection:bg-ios-blue/30 overflow-x-hidden")}>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="system"
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <main className="mx-auto w-full min-h-screen relative overflow-x-hidden md:flex md:items-center md:justify-center md:py-10">
-                        <div className="w-full md:max-w-4xl md:bg-white md:dark:bg-black md:rounded-[40px] md:shadow-2xl md:min-h-[85vh] md:overflow-hidden relative border-0 md:border border-gray-100 dark:border-gray-800">
-                            {children}
-                        </div>
+                    <TopNav />
+                    <main className="min-h-screen pt-[70px] pb-[80px] md:pb-0">
+                        {children}
                     </main>
+                    <BottomNav />
                 </ThemeProvider>
             </body>
         </html>
     )
 }
+
