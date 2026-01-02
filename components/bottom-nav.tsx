@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Layers, Box, Settings, Menu } from "lucide-react";
+import { Home, CreditCard, Wallet, ScanLine } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -10,10 +10,9 @@ export function BottomNav() {
 
     const NAV_ITEMS = [
         { label: "Home", href: "/", icon: Home },
-        { label: "Projects", href: "/#features", icon: Layers }, // Anchor to features or a dedicated page
-        { label: "APIHub", href: "/#api", icon: Box },
-        { label: "Theme", href: "#theme", icon: Settings, action: "toggle-theme" }, // Placeholder for theme toggle or modal
-        { label: "Menu", href: "#menu", icon: Menu },
+        { label: "Bank", href: "/bank", icon: CreditCard },
+        { label: "Wallet", href: "/ewallet", icon: Wallet },
+        { label: "KTP", href: "/ktp", icon: ScanLine },
     ];
 
     return (
