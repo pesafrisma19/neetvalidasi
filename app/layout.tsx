@@ -11,17 +11,28 @@ export const metadata: Metadata = {
     viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0',
 }
 
+import { ThemeProvider } from "@/components/theme-provider"
+
 export default function RootLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
     return (
-        <html lang="id">
-            <body className={cn(inter.className, "bg-ios-bg min-h-screen text-foreground antialiased selection:bg-ios-blue/30")}>
-                <main className="mx-auto max-w-md min-h-screen bg-white md:shadow-2xl md:my-0 relative overflow-hidden">
-                    {children}
-                </main>
+        <html lang="id" suppressHydrationWarning>
+            <body className={cn(inter.className, "bg-ios-bg dark:bg-black min-h-screen text-foreground antialiased selection:bg-ios-blue/30")}>
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    <main className="mx-auto w-full min-h-screen relative overflow-x-hidden md:flex md:items-center md:justify-center md:py-10">
+                        <div className="w-full md:max-w-4xl md:bg-white md:dark:bg-black md:rounded-[40px] md:shadow-2xl md:min-h-[85vh] md:overflow-hidden relative border-0 md:border border-gray-100 dark:border-gray-800">
+                            {children}
+                        </div>
+                    </main>
+                </ThemeProvider>
             </body>
         </html>
     )
