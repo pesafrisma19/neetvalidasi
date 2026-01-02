@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="id" suppressHydrationWarning>
-            <body className={cn(inter.className, "bg-ios-bg dark:bg-black min-h-screen text-foreground antialiased selection:bg-ios-blue/30 overflow-x-hidden")}>
+            <body className={cn(inter.className, "bg-background text-foreground min-h-screen antialiased selection:bg-primary/30 overflow-x-hidden")}>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="system"

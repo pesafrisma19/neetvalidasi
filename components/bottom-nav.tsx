@@ -16,25 +16,25 @@ export function BottomNav() {
     ];
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-black/90 backdrop-blur-lg border-t border-gray-100 dark:border-gray-800 pb-safe md:hidden z-50">
-            <div className="flex justify-around items-center px-2 py-3">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border pb-safe transition-colors duration-300">
+            <div className="grid grid-cols-4 h-[60px]">
                 {NAV_ITEMS.map((item) => {
                     const isActive = pathname === item.href;
                     return (
                         <Link
                             key={item.label}
                             href={item.href}
-                            className={cn(
-                                "flex flex-col items-center gap-1 min-w-[60px]",
-                                isActive ? "text-primary-blue" : "text-gray-400 hover:text-gray-600 dark:text-gray-500"
-                            )}
+                            className={`flex flex-col items-center justify-center gap-1 ${isActive
+                                    ? "text-blue-600"
+                                    : "text-muted-foreground hover:text-foreground"
+                                }`}
                         >
-                            <item.icon className={cn("w-6 h-6", isActive && "fill-current")} strokeWidth={isActive ? 2.5 : 2} />
+                            <item.icon className={`w-5 h-5 ${isActive ? "fill-current" : ""}`} />
                             <span className="text-[10px] font-medium">{item.label}</span>
                         </Link>
-                    );
+                    )
                 })}
             </div>
-        </div>
+        </nav>
     );
 }

@@ -43,23 +43,23 @@ export default function BankPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0f172a] p-4 md:p-8 flex items-center justify-center">
+        <div className="min-h-screen bg-background p-4 md:p-8 flex items-center justify-center transition-colors duration-300">
             <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8">
 
                 {/* Left Column: Form */}
                 <div className="flex flex-col justify-center">
-                    <Link href="/" className="inline-flex items-center text-gray-400 hover:text-white mb-8 transition-colors w-fit">
+                    <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8 transition-colors w-fit">
                         <ArrowLeft className="w-5 h-5 mr-2" /> Kembali
                     </Link>
 
-                    <div className="bg-[#1e293b] border border-gray-700 p-6 md:p-8 rounded-2xl shadow-xl">
+                    <div className="bg-card border border-border p-6 md:p-8 rounded-2xl shadow-xl transition-all duration-300">
                         <div className="flex items-center gap-4 mb-8">
                             <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
                                 <Landmark className="w-6 h-6" />
                             </div>
                             <div>
-                                <h1 className="text-2xl font-bold text-white">CEK REKENING</h1>
-                                <p className="text-gray-400 text-sm">Verifikasi data rekening bank via API</p>
+                                <h1 className="text-2xl font-bold text-card-foreground">CEK REKENING</h1>
+                                <p className="text-muted-foreground text-sm">Verifikasi data rekening bank via API</p>
                             </div>
                         </div>
 
@@ -70,8 +70,8 @@ export default function BankPage() {
                                 type="number"
                                 value={accountNumber}
                                 onChange={(e) => setAccountNumber(e.target.value)}
-                                className="bg-[#0f172a] border-gray-700 text-white placeholder:text-gray-600 focus:border-blue-500"
-                                labelClassName="text-gray-300"
+                                className="bg-background border-input text-foreground placeholder:text-muted-foreground focus:border-blue-500"
+                                labelClassName="text-card-foreground/80"
                             />
 
                             <SearchableSelect
@@ -107,4 +107,3 @@ export default function BankPage() {
         </div>
     );
 }
-
