@@ -1,15 +1,17 @@
+
 "use client";
 
 import { useState, useRef } from "react";
-import { IOSCard } from "@/components/ui/ios-card";
 import { IOSButton } from "@/components/ui/ios-button";
-import { ChevronLeft, Camera, Upload, CheckCircle2, AlertCircle } from "lucide-react";
-import Link from "next/link";
+import { TerminalResponse } from "@/components/terminal-response";
 import { ocrKtp } from "@/lib/api";
-import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft, ScanFace, Upload, X, Camera } from "lucide-react";
+import { IOSCard } from "@/components/ui/ios-card";
 
 export default function KtpPage() {
-    const [image, setImage] = useState<string | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
@@ -19,125 +21,155 @@ export default function KtpPage() {
         const file = e.target.files?.[0];
         if (file) {
             if (file.size > 2 * 1024 * 1024) {
-                setError("Ukuran foto maksimal 2MB");
+                setError("Ukuran file maksimal 2MB");
                 return;
             }
+            setSelectedFile(file);
+            setError(null);
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImage(reader.result as string);
-                setError(null);
-                setResult(null);
+                setPreview(reader.result as string);
             };
             reader.readAsDataURL(file);
         }
     };
 
+    const clearFile = () => {
+        setSelectedFile(null);
+        setPreview(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
     const handleProcess = async () => {
-        if (!image) return;
+        if (!selectedFile) {
+            setError("Silakan upload foto KTP terlebih dahulu");
+            return;
+        }
         setLoading(true);
         setError(null);
         setResult(null);
 
         try {
-            // API expects Base64 string. readAsDataURL includes the prefix "data:image/jpeg;base64,...".
-            // We might need to send pure base64 or the full string, usually full string or valid base64.
-            // Assuming API handles standard Data URI or we might need to strip prefix.
-            // Let's try sending as is first, or strip if API fails.
-            // Many APIs want raw base64.
-            const base64Content = image.split(',')[1];
-            const res = await ocrKtp(base64Content); // Try raw base64 first as "image (Base64)" usually implies content.
+            const convertToBase64 = (file: File): Promise<string> => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                        const result = reader.result as string;
+                        // Get pure base64 if needed, but usually APIs handle Data URI or we split
+                        // For this validation API, let's assume it needs pure Base64 or Data URI.
+                        // Based on previous code, let's send just the base64 part.
+                        const base64 = result.split(',')[1];
+                        resolve(base64);
+                    };
+                    reader.onerror = error => reject(error);
+                });
+            };
 
-            if (res && (res.data || res.nik)) { // Assuming success structure
+            const base64String = await convertToBase64(selectedFile);
+            const res = await ocrKtp(base64String);
+
+            if (res.status !== false) { // Handling potential different response structures
                 setResult(res.data || res);
             } else {
-                // Fallback if structure is different
-                if (res.status === false) {
-                    setError(res.message || "Gagal memproses KTP");
-                } else {
-                    setResult(res);
-                }
+                setError(res.message || "Gagal memproses KTP");
             }
         } catch (err) {
-            setError("Gagal memproses gambar / Koneksi Error");
+            setError("Terjadi kesalahan koneksi");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-ios-bg p-6 pt-8 pb-10 flex flex-col items-center">
-            <div className="w-full max-w-sm">
-                <div className="flex items-center mb-6 relative">
-                    <Link href="/" className="absolute left-0 p-2 -ml-2 text-ios-blue hover:opacity-70 transition-opacity">
-                        <ChevronLeft className="w-7 h-7" />
+        <div className="min-h-screen bg-[#0f172a] p-4 md:p-8 flex items-center justify-center">
+            <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                {/* Left Column: Form */}
+                <div className="flex flex-col justify-center">
+                    <Link href="/" className="inline-flex items-center text-gray-400 hover:text-white mb-8 transition-colors w-fit">
+                        <ArrowLeft className="w-5 h-5 mr-2" /> Kembali
                     </Link>
-                    <h1 className="flex-1 text-center text-[20px] font-semibold text-black">
-                        OCR KTP
-                    </h1>
+
+                    <div className="bg-[#1e293b] border border-gray-700 p-6 md:p-8 rounded-2xl shadow-xl">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-12 h-12 rounded-xl bg-orange-600 flex items-center justify-center text-white shadow-lg shadow-orange-600/20">
+                                <ScanFace className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold text-white">KTP OCR</h1>
+                                <p className="text-gray-400 text-sm">Ekstrak data KTP otomatis</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="w-full">
+                                <label className="text-sm font-medium text-gray-300 ml-1 mb-2 block">Upload Foto KTP *</label>
+
+                                {!preview ? (
+                                    <div
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="w-full h-48 border-2 border-dashed border-gray-600 rounded-xl bg-[#0f172a] hover:bg-[#1a2436] hover:border-orange-500 transition-all cursor-pointer flex flex-col items-center justify-center gap-2 group"
+                                    >
+                                        <div className="p-3 rounded-full bg-gray-800 group-hover:bg-orange-600/20 text-gray-400 group-hover:text-orange-500 transition-colors">
+                                            <Upload className="w-6 h-6" />
+                                        </div>
+                                        <span className="text-sm text-gray-400 font-medium pt-2">Klik untuk upload gambar</span>
+                                        <span className="text-xs text-gray-600">Max 2MB (JPG/PNG)</span>
+                                    </div>
+                                ) : (
+                                    <div className="relative w-full h-48 rounded-xl overflow-hidden border border-gray-700 group">
+                                        <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
+                                            <button
+                                                onClick={() => fileInputRef.current?.click()}
+                                                className="p-2 rounded-full bg-white/20 hover:bg-white/40 text-white transition-colors"
+                                            >
+                                                <Camera className="w-5 h-5" />
+                                            </button>
+                                            <button
+                                                onClick={clearFile}
+                                                className="p-2 rounded-full bg-red-500/80 hover:bg-red-600 text-white transition-colors"
+                                            >
+                                                <X className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleFileChange}
+                                />
+                            </div>
+
+                            <IOSButton
+                                onClick={handleProcess}
+                                isLoading={loading}
+                                className="w-full h-12 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-xl mt-4"
+                            >
+                                Proses OCR
+                            </IOSButton>
+                        </div>
+                    </div>
                 </div>
 
-                <IOSCard className="mb-6 flex flex-col gap-5 items-center justify-center min-h-[200px] border-dashed border-2 border-gray-300 bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer relative overflow-hidden"
-                    onClick={() => fileInputRef.current?.click()}
-                >
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleFileChange}
+                {/* Right Column: Terminal */}
+                <div className="flex flex-col h-full min-h-[500px]">
+                    <TerminalResponse
+                        loading={loading}
+                        result={result}
+                        error={error}
+                        title="OCR RESULT"
                     />
+                </div>
 
-                    {image ? (
-                        <div className="absolute inset-0 w-full h-full">
-                            <img src={image} alt="Preview" className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                <p className="text-white font-medium">Ganti Foto</p>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="text-center p-6">
-                            <div className="w-16 h-16 rounded-full bg-blue-50 text-ios-blue flex items-center justify-center mx-auto mb-4">
-                                <Camera className="w-8 h-8" />
-                            </div>
-                            <p className="text-sm font-medium text-gray-500">Tap untuk ambil foto atau upload</p>
-                        </div>
-                    )}
-                </IOSCard>
-
-                {image && (
-                    <IOSButton onClick={handleProcess} isLoading={loading} className="mb-6">
-                        Proses E-KTP
-                    </IOSButton>
-                )}
-
-                {error && (
-                    <div className="p-4 rounded-2xl bg-red-50 text-ios-red flex items-start gap-3 border border-red-100 mb-6 animate-in fade-in">
-                        <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                        <p className="text-sm font-medium leading-tight">{error}</p>
-                    </div>
-                )}
-
-                {result && (
-                    <IOSCard className="animate-in slide-in-from-bottom-4 duration-500">
-                        <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
-                            <CheckCircle2 className="w-6 h-6 text-ios-green" />
-                            <h3 className="text-lg font-semibold">Hasil Scan</h3>
-                        </div>
-
-                        <div className="space-y-4">
-                            {Object.entries(result).map(([key, value]) => {
-                                if (typeof value !== 'string') return null;
-                                return (
-                                    <div key={key} className="flex flex-col gap-1">
-                                        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{key.replace(/_/g, ' ')}</span>
-                                        <span className="text-base text-black font-medium break-words">{value}</span>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </IOSCard>
-                )}
             </div>
         </div>
     );
 }
+

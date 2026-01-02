@@ -4,14 +4,13 @@ import React from "react";
 interface IOSInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
+    labelClassName?: string;
 }
 
-export function IOSInput({ className, label, error, ...props }: IOSInputProps) {
+export function IOSInput({ className, label, error, labelClassName, ...props }: IOSInputProps) {
     return (
         <div className="flex flex-col gap-1.5 w-full">
-            {label && (
-                <label className="text-sm font-medium text-gray-500 ml-1">{label}</label>
-            )}
+            {label && <label className={cn("text-sm font-medium text-gray-500 ml-1", labelClassName)}>{label}</label>}
             <input
                 className={cn(
                     "w-full rounded-xl bg-ios-gray-100/50 p-4 text-[17px] outline-none transition-all placeholder:text-gray-400 focus:bg-ios-gray-100 focus:ring-2 focus:ring-ios-blue/20",
