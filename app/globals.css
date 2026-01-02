@@ -1,6 +1,24 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-ios-blue: #007AFF;
+  --color-ios-green: #34C759;
+  --color-ios-red: #FF3B30;
+  --color-ios-yellow: #FFCC00;
+
+  --color-ios-gray-50: #F2F2F7;
+  --color-ios-gray-100: #E5E5EA;
+  --color-ios-gray-200: #D1D1D6;
+  --color-ios-gray-300: #C7C7CC;
+  --color-ios-gray-400: #AEAEB2;
+  --color-ios-gray-500: #8E8E93;
+  --color-ios-gray-600: #636366;
+
+  --color-ios-bg: #F2F2F7;
+  --color-ios-card: rgba(255, 255, 255, 0.72);
+
+  --drop-shadow-ios: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
 
 :root {
   --background: #F2F2F7;
